@@ -5,7 +5,7 @@ var express = require('express'),
     mongoose = require('mongoose'),
     users = {};
 
-server.listen(8080);
+server.listen(3000);
 
 mongoose.connect('mongodb://heroku_app27701185:fo5jsk8461oeduuv6m6thdgq9d@ds037827.mongolab.com:37827/heroku_app27701185', function(err){
 	if(err){
