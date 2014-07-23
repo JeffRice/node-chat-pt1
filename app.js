@@ -2,9 +2,30 @@ var express = require('express'),
     app = express(),
     server = require('http').createServer(app),
     io = require('socket.io').listen(server);
+    mongoose = require('mongoose'),
     users = {};
 
 server.listen(8080);
+
+mongoose.connect('mongodb://heroku_app27701185:fo5jsk8461oeduuv6m6thdgq9d@ds037827.mongolab.com:37827/heroku_app27701185', function(err){
+	if(err){
+		console.log(err);
+	}
+	else {
+		console.log('Connected to mongodb');
+	}
+});
+
+
+var chatSchema = mongoose.Schema({
+	nick: String,
+	msg: String,
+	created: {type: Date, default: Date.now}
+});
+
+var Chat = mongoose.model('Message', chatSchema);
+
+
 
 app.get('/', function(req, res){
 	res.sendfile(__dirname + '/index.html')
@@ -12,6 +33,11 @@ app.get('/', function(req, res){
 
 
 io.sockets.on('connection', function(socket) {
+	var query = Chat.find({});
+	query.sort('-created').limit(10).exec(function(err, docs){
+		if(err) throw err;
+		socket.emit('load old msgs', docs);
+	});
 
 	socket.on('new user', function(data, callback) {
 		if (data in users){
@@ -25,9 +51,13 @@ io.sockets.on('connection', function(socket) {
 	});
 
 
+
+
 	function updateNicknames() {
 		io.sockets.emit('usernames', Object.keys(users));
 	}
+
+
 
 
 	socket.on('send message', function(data, callback) {
@@ -51,7 +81,12 @@ io.sockets.on('connection', function(socket) {
 			}
 		}
 		else {
-		io.sockets.emit('new message', {msg: msg, nick: socket.nickname});
+		var newMsg = new Chat({msg: msg, nick: socket.nickname});
+		newMsg.save(function(err){
+			if(err) throw err;
+			io.sockets.emit('new message', {msg: msg, nick: socket.nickname});
+		})	
+
 		}
 	});
 
