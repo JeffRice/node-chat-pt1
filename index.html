@@ -1,25 +1,46 @@
- <html>
+<html>
 <head>
 <title>Socket.io chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 #chat {
-	height: 500px;
+    height: 500px;
+    overflow-y:scroll;
 }
 #contentWrap {
-	display:none;
+    display:none;
+    width: 100%;
 }
-
+#chat li {
+    list-style-type: none;
+}
+#chat li:nth-child(odd) { background: #eee; }
 #chatWrap {
-	float: left;
-	border: 1px #000 solid;
+    float: left;
+    border: 1px #000 solid;
+    width: 75%;
+    margin-right: auto;
+    margin-left: auto;
 }
 .error{
     color: red;
 }
 .whisper{
-    color: gray;
+    color: steelblue;
     font-style: italic;
 }
+#users{
+    width:20%;
+    float:left;
+    margin-right: auto;
+    margin-left: auto;
+    overflow: hidden;
+}
+#chatWrap form { background: #ccc; padding: 3px; bottom: 0; width: 98%; }
+#chatWrap form input { border: 0; padding: 10px; width: 100%; margin-right: .5%; }
+#chatWrap form button { width: 9%; ; border: none; background-color: #bbb; padding: 10px; }
+.send-msg {background-color: #ccc; }
+.send-msg:hover { background-color: #000; transition: background-color 0.5s ease; color: #fff; transition: color 0.5s ease; }
 </style>
 </head>
 <body>
@@ -27,7 +48,7 @@
 		<p>enter username</p>
 		<p id="nickError"></p>
 		<form id="setNick">
-		<input size="45" id="nickname"></input>
+		<input size="45" id="nickname" ></input>
 		<input type="submit"></input>
 	</form></div>
 
@@ -36,10 +57,10 @@
 
 <div id="contentWrap">
 	<div id="chatWrap">
-	<div id="chat"></div>
+	<div id="chat"><ul></ul></div>
 	<form id="send-message">
-		<input size="45" id="message"></input>
-		<input type="submit"></input>
+		<input size="45" id="message" style="padding-top:25px;"></input>
+		<input class ="send-msg" type="submit"></input>
 	</form>
 </div>
 
@@ -81,7 +102,7 @@ jQuery(function($){
     $messageForm.submit(function(e) {
     	e.preventDefault();
     	socket.emit('send message', $messageBox.val(), function(data){
-        $chat.append('<span class="error"><b>' + data + "</span><br/>");
+        $chat.append('<li class="error"><b>' + data + "</li>");
         });
     	$messageBox.val('');
     });
@@ -99,11 +120,11 @@ jQuery(function($){
     });
 
     function displayMsg(data){
-        $chat.append('<span class="msg"><b>' + data.nick + ': </b>' + data.msg + "</span><br/>");
+        $chat.append('<li class="msg"><b>' + data.nick + ': </b>' + data.msg + "</li>");
     }
 
     socket.on('whisper', function(data){
-        $chat.append('<span class="whisper"><b>' + data.nick + ': </b>' + data.msg + "</span><br/>");
+        $chat.append('<li class="whisper"><b>' + data.nick + ': </b>' + data.msg + "</li>");
     });
 
         socket.on('usernames', function(data) {
