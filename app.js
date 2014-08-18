@@ -10,7 +10,7 @@ var port = Number(process.env.PORT || 5000);
 
 server.listen(port);
 
-mongoose.connect('mongodb://heroku_app27701185:fo5jsk8461oeduuv6m6thdgq9d@ds037827.mongolab.com:37827/heroku_app27701185', function(err){
+mongoose.connect('yourserver', function(err){
 	if(err){
 		console.log(err);
 	}
